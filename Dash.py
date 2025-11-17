@@ -172,9 +172,12 @@ def load_data(path="Comentarios.csv"):
     df['NPS'] = df['NPS'].astype(str)
     df['Categoria'] = df['Categoria'].astype(str)
     df['Centro'] = df['Centro'].astype(str)
+    df['NPS'] = df['NPS'].replace({'Positivo': 'Promotor'})
+
     # add year-month for time series
     df['year_month'] = df['Data Avaliação'].dt.to_period('M').astype(str)
     return df
+
 
 # Normalização simples
 def normalize_text(text):
@@ -280,7 +283,7 @@ with tabs[0]:
     st.header("Visão Geral dos Dados")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Avaliações", f"{len(df_f):,}")
-    col2.metric("Promotores", f"{(df_f['NPS']=='Positivo').sum():,}")
+    col2.metric("Promotores", f"{(df_f['NPS']=='Promotor').sum():,}")
     col3.metric("Neutros", f"{(df_f['NPS']=='Neutro').sum():,}")
     col4.metric("Detratores", f"{(df_f['NPS']=='Detrator').sum():,}")
 
@@ -306,7 +309,7 @@ with tabs[1]:
     with subtab[0]:
         st.subheader("1) Bigramas mais frequentes por polaridade (NPS)")
         cols = st.columns(3)
-        for i, nps in enumerate(['Positivo','Neutro','Detrator']):
+        for i, nps in enumerate(['Promotor','Neutro','Detrator']):
             with cols[i]:
                 df_n = df_f[df_f['NPS']==nps]
                 bigs = get_top_bigrams(df_n['text_clean'].values.astype('U'), n=n_top)
@@ -327,12 +330,12 @@ with tabs[1]:
             bigs = get_top_bigrams(df_f[df_f['Categoria']==c]['text_clean'].astype('U'), n=n_top) if df_f[df_f['Categoria']==c].shape[0]>0 else []
             st.table(bigram_df(bigs).head(20))
 
-    # 3. Bigrams por sentimento (sentimento derivado do texto: Positivo/Negativo)
-    # -> We'll assume NPS is the sentiment, but we'll also allow an automatic rule: NPS==Positivo => positivo; Detrator => negativo; Neutro => neutro.
+    # 3. Bigrams por sentimento (sentimento derivado do texto: Promotor/Negativo)
+    # -> We'll assume NPS is the sentiment, but we'll also allow an automatic rule: NPS==Promotor => Promotor; Detrator => negativo; Neutro => neutro.
     with subtab[2]:
         st.subheader("3) Bigramas por sentimento (usando NPS como proxy)")
-        sent_map = {'Positivo':'Positivo','Neutro':'Neutro','Detrator':'Negativo'}
-        for label, group in [('Positivo', df_f[df_f['NPS']=='Positivo']),
+        sent_map = {'Promotor':'Promotor','Neutro':'Neutro','Detrator':'Negativo'}
+        for label, group in [('Promotor', df_f[df_f['NPS']=='Promotor']),
                              ('Neutro', df_f[df_f['NPS']=='Neutro']),
                              ('Negativo (Detrator)', df_f[df_f['NPS']=='Detrator'])]:
             st.markdown(f"**{label}** — {len(group):,} avaliações")
@@ -379,13 +382,13 @@ with tabs[2]:
 
     # Which categories concentrate mais promotores?
     st.subheader("Categorias com mais Promotores")
-    if 'Positivo' in pivot.columns:
-        top_prom = pivot.sort_values('Positivo', ascending=False).reset_index().head(10)
-        fig_p = px.bar(top_prom, x='Positivo', y='Categoria', orientation='h', title="Top categorias por Promotores",
+    if 'Promotor' in pivot.columns:
+        top_prom = pivot.sort_values('Promotor', ascending=False).reset_index().head(10)
+        fig_p = px.bar(top_prom, x='Promotor', y='Categoria', orientation='h', title="Top categorias por Promotores",
                        color_discrete_sequence=px.colors.sequential.Oranges)
         st.plotly_chart(fig_p, use_container_width=True)
     else:
-        st.write("Sem registros de 'Positivo' no conjunto filtrado.")
+        st.write("Sem registros de 'Promotor' no conjunto filtrado.")
 
     # categories with most negative comments (here same as detratores)
     st.subheader("Categorias com mais comentários NEGATIVOS (Detratores)")
@@ -397,9 +400,9 @@ with tabs[2]:
 
     # categories with most positive comments
     st.subheader("Categorias com mais comentários POSITIVOS")
-    if 'Positivo' in pivot.columns:
-        fig_pos = px.bar(pivot.reset_index().head(20), x='Positivo', y='Categoria', orientation='h',
-                         title="Distribuição de Comentários Positivos por Categoria",
+    if 'Promotor' in pivot.columns:
+        fig_pos = px.bar(pivot.reset_index().head(20), x='Promotor', y='Categoria', orientation='h',
+                         title="Distribuição de Comentários Promotores por Categoria",
                          color_discrete_sequence=px.colors.sequential.Oranges)
         st.plotly_chart(fig_pos, use_container_width=True)
 
@@ -429,7 +432,7 @@ with tabs[3]:
 
     st.markdown("11) Sentimento dos Detratores e Promotores ao longo do tempo")
 
-    ts_dp = df_f[df_f['NPS'].isin(['Detrator','Positivo'])] \
+    ts_dp = df_f[df_f['NPS'].isin(['Detrator','Promotor'])] \
                 .groupby(['year_month_fmt','NPS']) \
                 .size().reset_index(name='count')
 
@@ -458,7 +461,7 @@ with tabs[4]:
     if st.button("Exportar top bigramas por NPS (CSV)"):
         # build csv
         out_rows = []
-        for nps in ['Positivo','Neutro','Detrator']:
+        for nps in ['Promotor','Neutro','Detrator']:
             gf = df_f[df_f['NPS']==nps]
             bigs = get_top_bigrams(gf['text_clean'].astype('U'), n=n_top)
             for big, cnt in bigs:
@@ -480,12 +483,12 @@ with tabs[4]:
     st.markdown(f"- **Palavras qua mais aparecem nas comentários identificadas como detratores:** {', '.join(top_neg_bigrams[:8])}")
     st.markdown("- **Ações rápidas recomendadas:**")
     st.write("""
-    1. Revisar estoque das categorias, executar inventário e priorizar reposição dos itens citados.
-    2. Treinamento rápido ao time de atendimento para as reclamações.
-    3. Monitoramento semanal de detratores, para identificar tendências de comportamento e priorizar ações de melhoria.
-    4. Implementar rotinas de verificação da sinalização de falta de produto no PDV e no sistema.
-    5. Responder comentários negativos com um fluxo padrão (pedido de desculpas + solução + follow-up).
-    6. Para bigramas positivos, amplificar via comunicação (ex.: promoções nas categorias muito elogiadas).
+    1.Revisar o estoque das categorias críticas, realizar inventário imediato e priorizar a reposição dos itens mais citados nas reclamações (ex.: alguns produtos, joelho de porco, itens faltantes em pedidos repetidos).
+    2.Realizar um treinamento rápido com o time de atendimento para padronizar respostas às principais reclamações — especialmente casos de atraso na entrega, problemas no último pedido e necessidade de entrar em contato com o cliente.
+    3.Monitorar semanalmente os detratores, identificando padrões como reclamações recorrentes (duas vezes, entrega em horas, último pedido) para orientar ações preventivas e melhorias contínuas.
+    4.Implementar rotinas de verificação diária da sinalização de falta de produtos no PDV e no sistema, garantindo que itens mencionados nas queixas não apareçam como disponíveis.
+    5.Responder imediatamente aos comentários negativos, seguindo um fluxo padrão: pedido de desculpas + solução clara + follow-up para confirmar se o problema foi resolvido — priorizando temas como atraso, erro de pedido e indisponibilidade de produtos.
+    6.Potencializar os bigramas positivos (“tudo ótimo”, elogios por região como Vila Andrade) em campanhas e comunicações, destacando categorias e serviços mais bem avaliados e criando promoções com base nos pontos fortes identificados.
     """)
 
     st.info("Essas ações devem ser priorizadas conforme volume de comentários/impacto operacional. Combine com dados operacionais (venda por SKU, prazo de entrega, etc.) para priorizar.")
