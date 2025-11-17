@@ -483,12 +483,18 @@ with tabs[4]:
     st.markdown(f"- **Palavras qua mais aparecem nas comentários identificadas como detratores:** {', '.join(top_neg_bigrams[:8])}")
     st.markdown("- **Ações rápidas recomendadas:**")
     st.write("""
-    1.Revisar o estoque das categorias críticas, realizar inventário imediato e priorizar a reposição dos itens mais citados nas reclamações (ex.: alguns produtos, joelho de porco, itens faltantes em pedidos repetidos).
-    2.Realizar um treinamento rápido com o time de atendimento para padronizar respostas às principais reclamações — especialmente casos de atraso na entrega, problemas no último pedido e necessidade de entrar em contato com o cliente.
-    3.Monitorar semanalmente os detratores, identificando padrões como reclamações recorrentes (duas vezes, entrega em horas, último pedido) para orientar ações preventivas e melhorias contínuas.
-    4.Implementar rotinas de verificação diária da sinalização de falta de produtos no PDV e no sistema, garantindo que itens mencionados nas queixas não apareçam como disponíveis.
-    5.Responder imediatamente aos comentários negativos, seguindo um fluxo padrão: pedido de desculpas + solução clara + follow-up para confirmar se o problema foi resolvido — priorizando temas como atraso, erro de pedido e indisponibilidade de produtos.
-    6.Potencializar os bigramas positivos (“tudo ótimo”, elogios por região como Vila Andrade) em campanhas e comunicações, destacando categorias e serviços mais bem avaliados e criando promoções com base nos pontos fortes identificados.
+    
+             1.Revisar o estoque das categorias críticas, realizar inventário imediato e priorizar a reposição dos itens mais citados nas reclamações (ex.: alguns produtos, joelho de porco, itens faltantes em pedidos repetidos).
+    
+             2.Realizar um treinamento rápido com o time de atendimento para padronizar respostas às principais reclamações — especialmente casos de atraso na entrega, problemas no último pedido e necessidade de entrar em contato com o cliente.
+    
+             3.Monitorar semanalmente os detratores, identificando padrões como reclamações recorrentes (duas vezes, entrega em horas, último pedido) para orientar ações preventivas e melhorias contínuas.
+    
+             4.Implementar rotinas de verificação diária da sinalização de falta de produtos no PDV e no sistema, garantindo que itens mencionados nas queixas não apareçam como disponíveis.
+    
+             5.Responder imediatamente aos comentários negativos, seguindo um fluxo padrão: pedido de desculpas + solução clara + follow-up para confirmar se o problema foi resolvido — priorizando temas como atraso, erro de pedido e indisponibilidade de produtos.
+    
+             6.Potencializar os bigramas positivos (“tudo ótimo”, elogios por região como Vila Andrade) em campanhas e comunicações, destacando categorias e serviços mais bem avaliados e criando promoções com base nos pontos fortes identificados.
     """)
 
     st.info("Essas ações devem ser priorizadas conforme volume de comentários/impacto operacional. Combine com dados operacionais (venda por SKU, prazo de entrega, etc.) para priorizar.")
