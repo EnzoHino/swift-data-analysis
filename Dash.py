@@ -13,7 +13,6 @@ import ast
 # Se necessário, descomente para baixar stopwords uma vez
 # nltk.download('stopwords')
 from nltk.corpus import stopwords
-STOPWORDS = set(stopwords.words('portuguese'))
 
 with open('stopwords.txt', 'r', encoding='utf-8') as f:
     STOPWORDS = set(ast.literal_eval(f.read()))
