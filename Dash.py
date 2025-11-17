@@ -8,11 +8,15 @@ from collections import Counter
 import nltk
 import re
 from datetime import datetime
+import ast
 
 # Se necessário, descomente para baixar stopwords uma vez
 # nltk.download('stopwords')
 from nltk.corpus import stopwords
 STOPWORDS = set(stopwords.words('portuguese'))
+
+with open('stopwords.txt', 'r', encoding='utf-8') as f:
+    STOPWORDS = set(ast.literal_eval(f.read()))
 
 CUSTOM_STOPWORDS = {
     "ta", "tá", "tah", "tava", "so", "mt", "pra", "pro", "ser", "será",
