@@ -10,8 +10,6 @@ import re
 from datetime import datetime
 import ast
 
-# Se necessário, descomente para baixar stopwords uma vez
-# nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 with open('stopwords.txt', 'r', encoding='utf-8') as f:
@@ -25,10 +23,7 @@ CUSTOM_STOPWORDS = {
  
 ALL_STOPWORDS = STOPWORDS.union(CUSTOM_STOPWORDS)
 
-# -----------------------
-# Config Streamlit / tema laranja
-# -----------------------
-st.set_page_config(layout="wide", page_title="Dash NPS - Swift", page_icon="🟠")
+st.set_page_config(layout="wide", page_title="Dash NPS - Swift", page_icon="./swift-convertido-de-jpeg (1).png")
 st.markdown(
     """
     <style>
@@ -477,25 +472,20 @@ with tabs[4]:
         pivot_display.to_csv("pivot_categoria_nps.csv", index=False)
         st.success("Arquivo salvo: pivot_categoria_nps.csv")
 
-    st.markdown("### 12) Ações sugeridas (resumo automático baseado nos achados)")
+    st.markdown("### 12) Ações sugeridas")
     st.write("As ações abaixo são geradas a partir das análises (bigramas frequentes e categorias com mais detratores). Ajuste conforme contexto da loja:")
-
-    # Simple auto recommender based on top negative bigrams and categories
-    # find top negative bigrams global
     neg_bigs = get_top_bigrams(df_f[df_f['NPS']=='Detrator']['text_clean'].astype('U'), n=30)
     top_neg_bigrams = [b for b,c in neg_bigs[:10]]
     st.markdown("**Sugestões automáticas**:")
-    st.markdown(f"- **Problemas identificados com frequência nos comentários negativos (exemplos de bigramas):** {', '.join(top_neg_bigrams[:8])}")
+    st.markdown(f"- **Palavras qua mais aparecem nas comentários identificadas como detratores:** {', '.join(top_neg_bigrams[:8])}")
     st.markdown("- **Ações rápidas recomendadas:**")
     st.write("""
-    1. Revisar estoque das categorias com maior volume de detratores — executar inventário e priorizar reposição dos itens citados.
-    2. Treinamento rápido ao time de atendimento para as categorias com mais reclamações (script + resolução imediata).
-    3. Monitoramento semanal (KPI) de detratores por categoria; metas de redução mês a mês.
+    1. Revisar estoque das categorias, executar inventário e priorizar reposição dos itens citados.
+    2. Treinamento rápido ao time de atendimento para as reclamações.
+    3. Monitoramento semanal de detratores, para identificar tendências de comportamento e priorizar ações de melhoria.
     4. Implementar rotinas de verificação da sinalização de falta de produto no PDV e no sistema.
     5. Responder comentários negativos com um fluxo padrão (pedido de desculpas + solução + follow-up).
-    6. Se bigramas negativos referirem preço/valor, revisar política de promoções/etiquetagem.
-    7. Para bigramas positivos, amplificar via comunicação (ex.: promoções nas categorias muito elogiadas).
+    6. Para bigramas positivos, amplificar via comunicação (ex.: promoções nas categorias muito elogiadas).
     """)
 
     st.info("Essas ações devem ser priorizadas conforme volume de comentários/impacto operacional. Combine com dados operacionais (venda por SKU, prazo de entrega, etc.) para priorizar.")
-
